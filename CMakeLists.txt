@@ -9,7 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
 
 set(CARGO_MANIFEST ${CMAKE_SOURCE_DIR}/Cargo.toml)
-set(CARGO_TARGET_DIR ${CMAKE_SOURCE_DIR}/target)
+set(CARGO_TARGET_DIR ${CMAKE_BINARY_DIR}/target)
 
 set(BLOBSTORE_SOURCE_FILE ${CMAKE_SOURCE_DIR}/src/lib.rs)
 set(BLOBSTORE_BRIDGE_CPP ${CARGO_TARGET_DIR}/cxxbridge/blobstore/src/lib.rs.cc)
@@ -22,17 +22,22 @@ else()
     set(BLOBSTORE_LIB ${CARGO_TARGET_DIR}/release/${CMAKE_STATIC_LIBRARY_PREFIX}blobstore${CMAKE_STATIC_LIBRARY_SUFFIX})
 endif()
 
+# cmake
 message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 message("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 message("CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
+# cargo
 message("CARGO_BUILD_MODE: ${CARGO_BUILD_MODE}")
+message("CARGO_TARGET_DIR: ${CARGO_TARGET_DIR}")
+# c++ bridge
 message("BLOBSTORE_BRIDGE_CPP: ${BLOBSTORE_BRIDGE_CPP}")
+# crate lib
 message("BLOBSTORE_LIB: ${BLOBSTORE_LIB}")
 
 # Add a custom command that builds the rust crate and generates C++ bridge code
 add_custom_command(
         OUTPUT ${BLOBSTORE_BRIDGE_CPP} ${BLOBSTORE_LIB}
-        COMMAND cargo build ${CARGO_BUILD_MODE} --manifest-path ${CARGO_MANIFEST}
+        COMMAND cargo build ${CARGO_BUILD_MODE} --target-dir ${CARGO_TARGET_DIR} --manifest-path ${CARGO_MANIFEST}
         DEPENDS ${BLOBSTORE_SOURCE_FILE}
         USES_TERMINAL
         COMMENT "Running cargo..."
